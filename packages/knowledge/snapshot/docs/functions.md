@@ -1,0 +1,19 @@
+# Functions
+
+## Overview
+Use `function int add(int left, int right = 2) { return left + right; }` with `gungnirc --strict`. Functions require declared return types. Calls support literal defaults and named arguments; supplied arguments are evaluated in source order. Framework methods infer their documented response/decision/void contracts. Public, protected and private members are checked.
+
+## Scope
+Defaults currently require literal constants. Native overload resolution, variadic functions and general class inheritance are outside this profile. Async calls require explicit `await` inside an async callable.
+
+Declared instance methods require a mutable receiver. Use a `let` binding when calling these methods; a `const` instance or an immutable value capture is rejected with `GNR2208`. Methods on injected services remain available through their handles.
+
+
+
+- [Structured compiler API](../include/gungnir/language/compiler.hpp)
+- [Structured compiler tests](../tests/structured_language.cpp)
+
+- [include/gungnir/language/ast.hpp](../include/gungnir/language/ast.hpp)
+- [src/language/parser.cpp](../src/language/parser.cpp)
+
+See [Documentation](README.md) and [Getting Started](getting-started.md).
