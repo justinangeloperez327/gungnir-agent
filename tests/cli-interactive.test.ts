@@ -106,7 +106,7 @@ describe("CLI streaming and cancellation boundaries", () => {
     expect(out.some(e => e.type === "error" && e.text.includes("CONTEXT_LIMIT"))).toBe(true);
     const secret: CliEvent[] = [];
     const errors = new AgentCliSession({ backend: {
-      async *streamText(): AsyncGenerator<string> { throw new Error("SECRET_API_KEY=private"); },
+      async *streamText(): AsyncGenerator<string> { yield "public text"; throw new Error("SECRET_API_KEY=private"); },
     } });
     await errors.handleLine("go", e => secret.push(e));
     expect(JSON.stringify(secret)).not.toContain("SECRET_API_KEY");
