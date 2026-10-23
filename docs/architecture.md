@@ -1,30 +1,32 @@
-# Architecture — Groups 1–4
+# Architecture — Groups 1–5
 
 ```text
 apps/cli
   -> packages/agent-core
        -> packages/contracts
        -> packages/gungnir-toolchain
-  -> packages/gungnir-toolchain (opt-in doctor)
+  -> packages/gungnir-toolchain (explicit doctor)
 ```
 
-Group 2 introduces typed config, DI and task state. Group 3 provides read-only
-Gungnir SDK discovery. Group 4 adds `TrustedWorkspace`,
-`DefaultExecutionPolicy`, `enforcePermission` and
-`ControlledProcessRunner` to the agent core.
+- Group 2: typed configuration, DI, sanitized errors and task states.
+- Group 3: read-only SDK discovery and compiler contract detection.
+- Group 4: trusted workspace, permission engine, controlled process runner.
+- Group 5: `GungnirProjectIndex` — bounded, read-only source discovery,
+  file-category metadata, path/module hints, filename/source-line lookup.
 
-No public agent modes or model-facing execution tools are registered yet.
-A Build mode string or ToolRequest is never itself authorization. The host
-must supply trust and explicit permission for each requested process or write.
+The CLI still only supports help/version/doctor. Ask/Plan/Build, MCP and
+model-driven tools remain unimplemented; no model can invoke the process runner.
 
-Gungnir's native compiler and language server remain the authority for `.gnr`
-semantics. Groups 5–6 add context and read-only MCP; Groups 11–15 add
-generators, transactional file writes, diagnostics, builds and repair.
+## Module intelligence boundary
 
-## Remaining security work
+The index is a bounded navigation aid, not another Gungnir grammar parser.
+Module path and import metadata are **unverified hints**; semantically resolved
+dependencies, symbols, references and diagnostics come from the C++ compiler
+and native LSP in later groups.
 
-Group 4's path authorization is a preflight only; do not use it as a substitute
-for atomic no-follow file writes or process isolation. The approved runner is
-not a sandbox and cannot prevent an authorized executable from accessing files
-outside the workspace or creating descendant processes. Git writes, migrations,
-deployments and publishing remain denied by default.
+## Security limitations
+
+Group 4's path checks and Group 5's scan are best effort, not an OS sandbox.
+No automatic source-to-LLM forwarding is allowed; future prompt construction
+must treat indexed text as untrusted and may need secret scrubbing. No external
+downloads, application builds, auto-publishing or deployment take place.
