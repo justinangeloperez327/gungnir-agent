@@ -1,50 +1,43 @@
 # Gungnir Agent
 
-A Node.js 24 coding-agent foundation for the
-[Gungnir C++23 framework](https://github.com/justinangeloperez327/gungnir).
+Node.js 24 coding-agent foundation for the Gungnir C++23 framework.
 
-**Group 8:** Real AI SDK v6 text streaming for explicitly configured OpenAI,
-Anthropic or Vercel AI Gateway models. The Ask, Plan and Build CLI modes
-remain **text-only**; there are no executable model tools or source edits.
+Group 9 includes an offline source-backed knowledge index: 52 pinned
+Gungnir v1.0.2 documentation pages and example .gnr files, with
+commit-pinned file/line references and optional, explicitly trusted
+private-file context.
 
-## Installation and checks
+## Install and check
 
-```sh
-npm ci
-npm run check
-npm run start -- --help
-npm run start -- interactive
-```
+    npm ci
+    npm run check
+    npm run start -- interactive
+    npm run start -- doctor
 
-## AI model configuration
+Search public Gungnir docs without an API key using /docs routing
+or /docs model. Check references from the last successful model reply
+with /sources. /usage, /files, /read, /search, /mode, and /cancel
+remain available.
 
-Set the provider's API key as an environment variable. Never place the key
-in CLI arguments or commit it to the repository. Then select the provider
-and a model ID supported by your account:
+To generate source-backed model responses, set your own environment
+provider key (OPENAI_API_KEY, ANTHROPIC_API_KEY or AI_GATEWAY_API_KEY)
+and explicitly select a provider and supported model:
 
-```sh
-npm run start -- ask --provider openai --model YOUR_MODEL --message "Explain Gungnir controllers"
-npm run start -- plan --provider anthropic --model YOUR_MODEL --message "Design a Gungnir application"
-npm run start -- interactive --provider gateway --model provider/model
-```
+    npm run start -- ask --provider openai --model YOUR_MODEL --message "How do Gungnir models work?"
 
-Supported environment variables: `OPENAI_API_KEY`,
-`ANTHROPIC_API_KEY`, `AI_GATEWAY_API_KEY`. There is no default model
-to avoid accidental paid requests. Optional session limits and explicit
-estimated-USD budgets are described in [Group 8 documentation](docs/group-8-models.md).
+No API key or paid model is selected by default.
 
-Interactive commands: `/help`, `/mode`, `/status`, `/usage`,
-`/files`, `/search`, `/read`, `/cancel`, `/exit`.
+By default, no local project source is sent to any model provider.
+The --context-file app/models/User.gnr option sends the selected file
+ONLY when paired with --project-root /absolute/project and
+--trust-workspace, and subject to size and secret screening.
+Never select files with information you are not permitted to disclose.
 
-Reading local source still requires
-`--project-root /absolute/project --trust-workspace`.
-Prompts do not automatically include source code.
+Documentation and limitations: docs/group-9-knowledge.md
+Architecture: docs/architecture.md
+Roadmap: docs/roadmap.md
 
-Packages: `apps/cli`, `packages/contracts`, `packages/agent-core`,
-`packages/gungnir-toolchain`, `packages/mcp-client`, and
-`packages/model-adapters`. The existing standalone
-[gungnir-mcp](https://github.com/justinangeloperez327/gungnir-mcp)
-remains the only authoritative MCP server.
-
-CI runs on Windows 2025/Ubuntu 24.04 using Node 24. No PR, npm publication
-or deployment is automatically created.
+The official MCP stdio server remains the separate gungnir-mcp repository.
+Build mode is still text-only; models cannot modify files or run native
+commands. GitHub Actions uses Node.js 24 on Windows and Ubuntu, without
+automatic publishing or deployment.

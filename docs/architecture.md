@@ -1,20 +1,22 @@
-# Architecture — Groups 1–8
+# Architecture — Groups 1–9
 
-```text
-apps/cli (Ask/Plan/Build terminal, mode switch, cancellation)
-  -> packages/model-adapters (AI SDK v6 provider adapters; text only)
-  -> packages/agent-core (session, trusted workspace, permissions)
-  -> packages/mcp-client (outbound v2 client, opt-in only)
-  -> packages/gungnir-toolchain (doctor)
-```
+    apps/cli
+      -> packages/knowledge (pinned v1.0.2 docs and source references)
+      -> KnowledgeTextBackend (retrieval context adapter)
+        -> packages/model-adapters (AI SDK v6 text streaming)
+      -> packages/agent-core (trusted workspace and .gnr index)
+      -> packages/mcp-client (outbound official MCP v2 client)
+      -> packages/gungnir-toolchain (explicit SDK doctor)
 
-Group 8 uses official AI SDK v6 and matching provider packages for OpenAI,
-Anthropic and Gateway. Operators explicitly select a provider and model
-and supply keys through environment variables. CLI status/usage does not
-display secrets. No tools are registered with the model. Even Build mode
-generates plans or patches **as text** and cannot change the repository.
+The sole official MCP server remains justinangeloperez327/gungnir-mcp.
+Group 9 adds locally bundled knowledge, a deterministic lexical
+retrieval index and source-citation output. Model prompts attach
+retrieved text as untrusted JSON-quoted reference data.
 
-No automatic retrieval of source text, project mutation, native compiler
-execution, external MCP actions, deployment or publication.
-Group 9 will add cited context selection and source handling.
-Group 10 will add durable bounded orchestration.
+Project browsing trust does not automatically grant access to provider
+prompt context. An existing private .gnr file must be explicitly
+selected, size checked and screened before forwarding.
+
+Ask, Plan and Build remain text only. Models cannot execute native
+processes, write files, publish, deploy or modify Git. Native Gungnir
+compiler and LSP diagnostics remain the semantic source of truth.
