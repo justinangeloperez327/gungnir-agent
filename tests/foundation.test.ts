@@ -6,13 +6,11 @@ import { resolve } from "node:path";
 
 const cli = resolve(process.cwd(), "apps/cli/dist/index.js");
 
-describe("Group 1 package contracts", () => {
-  it("declares the actual foundation status without claiming modes work", () => {
+describe("foundation contract", () => {
+  it("does not claim the future agent modes are operational", () => {
     expect(getFoundationStatus()).toEqual({
-      product: "gungnir-agent",
-      stage: "foundation",
-      languageContract: "1.0",
-      plannedModes: ["ask", "plan", "build"],
+      product: "gungnir-agent", stage: "foundation",
+      languageContract: "1.0", plannedModes: ["ask", "plan", "build"],
     });
     expect(PLANNED_AGENT_MODES).toHaveLength(3);
     expect(TARGET_LANGUAGE_CONTRACT).toBe("1.0");
@@ -20,21 +18,19 @@ describe("Group 1 package contracts", () => {
 });
 
 describe("CLI smoke tests", () => {
-  it("prints help without reporting implementation of future features", () => {
+  it("prints Group 2 help and warns that agent modes are unavailable", () => {
     const result = spawnSync(process.execPath, [cli, "--help"], { encoding: "utf8" });
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("Group 1 foundation");
+    expect(result.stdout).toContain("Group 2 foundation");
     expect(result.stdout).toContain("not yet implemented");
   });
-
-  it("prints version and target contract", () => {
+  it("prints version and target language contract", () => {
     const result = spawnSync(process.execPath, [cli, "--version"], { encoding: "utf8" });
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("0.1.0");
     expect(result.stdout).toContain("contract 1.0");
   });
-
-  it("rejects unimplemented modes with a nonzero exit code", () => {
+  it("rejects unimplemented modes", () => {
     const result = spawnSync(process.execPath, [cli, "build"], { encoding: "utf8" });
     expect(result.status).toBe(2);
     expect(result.stderr).toContain("Unsupported command");

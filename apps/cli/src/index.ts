@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-
 import { getFoundationStatus } from "@gungnir/agent-core";
 
 const help = [
-  "Gungnir Agent — Group 1 foundation",
+  "Gungnir Agent — Group 2 foundation",
   "",
   "Usage: gungnir-agent [--help | --version]",
   "",

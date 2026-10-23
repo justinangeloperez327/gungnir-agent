@@ -1,10 +1,4 @@
-# Architecture — initial foundation
-
-## Scope
-
-Group 1 establishes TypeScript package interfaces and a CLI shell. No language model, Gungnir subprocess, code-writing tool, or MCP endpoint exists in this group.
-
-Current package dependencies:
+# Architecture — Groups 1–2
 
 ```text
 apps/cli
@@ -13,26 +7,15 @@ apps/cli
        -> packages/gungnir-toolchain
 ```
 
-The shared contracts describe **planned** agent modes, not yet available capabilities. Dependencies point from entry points to abstractions; the CLI must not acquire its own compiler/parser implementation.
+Group 2 adds shared tool/task interfaces and a minimal, synchronous agent-core foundation. CLI remains help/version only. There is no model integration, executable tool runner, file-writing implementation or MCP server.
 
-## Native Gungnir integration (future)
+## Separation of responsibilities
 
-- Group 3: executable/SDK discovery and `gungnirc --print-contract`.
-- Group 4: enforce workspace trust and process-approval policies.
-- Group 6: read-only MCP server, separately exposing the same core tool layer.
-- Group 13: compiler and LSP diagnostics.
-- Group 14: `gungnir build` and feature tests.
-- Group 15: bounded error-repair loops.
+- **Contracts:** descriptive modes/capabilities and cancellable tool invocation interfaces.
+- **Agent core:** pure config validation, typed DI, sanitized errors and in-memory task lifecycle.
+- **Gungnir toolchain:** version target only. SDK discovery and compatibility negotiation are Group 3.
+- **Authorization:** not yet implemented. A `build` mode string must never authorize execution.
 
-The Gungnir compiler and LSP are the language-semantic authority. No TypeScript substitute lexer, parser, compiler, or speculative refactor engine should be introduced.
+## Forward requirements
 
-## Security invariants
-
-1. All paths are canonicalized and checked against an authorized workspace boundary.
-2. External commands always use executable + argument arrays; no unbounded shell execution.
-3. Ask/Plan cannot write files or start modifying commands.
-4. Build operations require explicit execution policy; high-impact operations need explicit approval.
-5. Model output, local source comments, tool results, and fetched documents are untrusted input.
-6. Credentials are excluded from prompts, logs, diffs, and test reports.
-7. All retries, process lifetimes, token budgets, and task sessions must have enforceable limits.
-8. The repo's CI must never auto-publish or deploy.
+Group 4 must enforce canonical workspace paths, symlink boundaries, explicit tool permissions, safe process arguments, timeout and cancellation. Generated code must be compiled using the native Gungnir toolchain rather than a duplicate TypeScript parser. Prompt content and tool results are untrusted and secrets must not enter public errors or logs. CI must never auto-publish or deploy.
