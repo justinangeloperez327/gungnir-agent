@@ -7,12 +7,15 @@ export { parseAgentConfig } from "./config.js";
 export { ServiceContainer, createServiceToken } from "./container.js";
 export type { ServiceToken } from "./container.js";
 export { TaskStateMachine } from "./task-state.js";
+export { TrustedWorkspace } from "./security/workspace.js";
+export { DefaultExecutionPolicy, enforcePermission } from "./security/policy.js";
+export type { ApprovalHandler } from "./security/policy.js";
+export { ControlledProcessRunner } from "./security/process.js";
+export type { ProcessCommand, ProcessOutcome } from "./security/process.js";
 
-export const PLANNED_AGENT_MODES: readonly AgentMode[] = Object.freeze([
-  "ask", "plan", "build",
-]);
+export const PLANNED_AGENT_MODES: readonly AgentMode[] = Object.freeze(["ask", "plan", "build"]);
 
-/** Foundation metadata, not an operational coding agent. */
+/** Agent modes are not operational until later groups. */
 export function getFoundationStatus(): AgentFoundation {
   return {
     product: "gungnir-agent", stage: "foundation",

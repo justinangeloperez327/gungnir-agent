@@ -1,20 +1,30 @@
-# Architecture — Groups 1–3
+# Architecture — Groups 1–4
 
 ```text
 apps/cli
   -> packages/agent-core
        -> packages/contracts
        -> packages/gungnir-toolchain
-  -> packages/gungnir-toolchain (doctor)
+  -> packages/gungnir-toolchain (opt-in doctor)
 ```
 
-Group 2 provides typed configuration, DI, error handling and in-memory task states. Group 3 adds optional, read-only native Gungnir toolchain discovery with injectable probe I/O, fixed command arguments and contract parsing.
+Group 2 introduces typed config, DI and task state. Group 3 provides read-only
+Gungnir SDK discovery. Group 4 adds `TrustedWorkspace`,
+`DefaultExecutionPolicy`, `enforcePermission` and
+`ControlledProcessRunner` to the agent core.
 
-- `apps/cli`: help/version and explicitly invoked `doctor`. No agent modes run.
-- `packages/gungnir-toolchain`: installed CLI/compiler discovery, SDK profile inspection, version/contract compatibility.
-- `packages/agent-core`: no process execution orchestration or runtime authorizations yet.
-- `packages/contracts`: descriptive tool capabilities and future policy interfaces.
+No public agent modes or model-facing execution tools are registered yet.
+A Build mode string or ToolRequest is never itself authorization. The host
+must supply trust and explicit permission for each requested process or write.
 
-A `ready` toolchain report says the installed SDK matches the documented Gungnir 1.0 contract. It does not imply any project has compiled or that arbitrary process execution is safe. The compiler and LSP remain the authority for language semantics; no duplicate Gungnir parser is planned.
+Gungnir's native compiler and language server remain the authority for `.gnr`
+semantics. Groups 5–6 add context and read-only MCP; Groups 11–15 add
+generators, transactional file writes, diagnostics, builds and repair.
 
-Security work remains in Group 4: canonical workspace/executable paths, permission enforcement, subprocess containment, timeout/cancellation and trust gates. No model output can currently initiate native commands.
+## Remaining security work
+
+Group 4's path authorization is a preflight only; do not use it as a substitute
+for atomic no-follow file writes or process isolation. The approved runner is
+not a sandbox and cannot prevent an authorized executable from accessing files
+outside the workspace or creating descendant processes. Git writes, migrations,
+deployments and publishing remain denied by default.

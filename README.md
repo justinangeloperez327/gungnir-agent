@@ -1,14 +1,17 @@
 # Gungnir Agent
 
-A Gungnir-aware coding agent foundation for the [Gungnir C++23 framework](https://github.com/justinangeloperez327/gungnir).
+A Gungnir-aware coding agent foundation for the
+[Gungnir C++23 framework](https://github.com/justinangeloperez327/gungnir).
 
-> **Group 3:** The agent now detects an installed Gungnir CLI/compiler, SDK metadata, package versions and the structured compiler contract. No AI model calls, file edits, builds, MCP endpoint or general process execution are enabled.
+> **Group 4:** The project now has explicit workspace trust and path checks,
+> fail-closed permissions, per-command host approval and a bounded child
+> process runner. This is infrastructure, **not an operational AI agent**.
+> No AI model calls, autonomous edits or MCP endpoint are implemented.
 
 ## Requirements
 
-- Node.js **24**
-- npm
-- Gungnir SDK is optional for package development; required for a successful `doctor` result.
+- Node.js 24 and compatible npm
+- Gungnir SDK optional for package development; needed for a successful doctor result
 
 ## Setup
 
@@ -20,20 +23,23 @@ npm run start -- doctor
 npm run start -- doctor --json
 ```
 
-`doctor` is explicitly invoked, read-only, and returns exit status 0 only when a matching, complete stable Gungnir 1.0 SDK is detected. It does not modify project files, start a development server, or download an SDK.
+`doctor` performs explicit SDK compatibility probes. Do not run it on
+untrusted executable paths. `ask`, `plan` and `build` remain unimplemented.
 
-To select a Gungnir SDK, set the absolute `GUNGNIR_CMAKE_PREFIX` to its root (not `bin`) or put its `bin` directory on PATH. SDK discovery prioritizes explicit configuration, then `GUNGNIR_CMAKE_PREFIX`, then PATH. Invalid explicit configuration does not fall back silently.
+## Components
 
-`ask`, `plan` and `build` remain unimplemented CLI commands.
+- `apps/cli`: help, version and opt-in toolchain doctor
+- `packages/contracts`: typed task/tool interfaces
+- `packages/agent-core`: configuration, DI, errors, task lifecycle and
+  security components
+- `packages/gungnir-toolchain`: SDK discovery and compiler contract probing
 
-## Monorepo
+The security layer is not an OS sandbox: externally approved processes execute
+with the user's privileges. Future code-writing and model-execution integrations
+must enforce host permissions and atomic filesystem operations.
 
-- `apps/cli` — help, version, opt-in doctor.
-- `packages/agent-core` — typed config, DI, task states and errors.
-- `packages/contracts` — future task/tool interfaces.
-- `packages/gungnir-toolchain` — read-only SDK discovery, probes, contract parsing.
-- `tests` — cross-platform fixtures, CLI and contract tests.
+Read the [Group 4 security contract](docs/group-4-security.md),
+[architecture](docs/architecture.md) and [roadmap](docs/roadmap.md).
 
-See [Group 3 documentation](docs/group-3-toolchain.md), [architecture](docs/architecture.md) and [roadmap](docs/roadmap.md).
-
-CI checks Windows and Ubuntu on Node.js 24 and never publishes or deploys.
+Windows/Ubuntu GitHub Actions uses Node 24. There is no automatic publishing
+or deployment.
