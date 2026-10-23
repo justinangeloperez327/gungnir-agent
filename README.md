@@ -3,47 +3,48 @@
 A Node.js 24 coding-agent foundation for the
 [Gungnir C++23 framework](https://github.com/justinangeloperez327/gungnir).
 
-> **Group 7:** Interactive CLI modes (Ask, Plan, Build), piped sessions,
-> streamed text rendering, cancellation and trusted read-only `.gnr`
-> browsing are implemented. **No model backend is connected yet.**
-> Text prompts return an explicit unavailable-model message until Group 8.
+**Group 8:** Real AI SDK v6 text streaming for explicitly configured OpenAI,
+Anthropic or Vercel AI Gateway models. The Ask, Plan and Build CLI modes
+remain **text-only**; there are no executable model tools or source edits.
 
-## Setup
+## Installation and checks
 
-```bash
+```sh
 npm ci
 npm run check
+npm run start -- --help
 npm run start -- interactive
-npm run start -- ask
-npm run start -- plan --message "Design a Gungnir User model"
-npm run start -- doctor
 ```
 
-To inspect an explicitly trusted Gungnir project:
+## AI model configuration
 
-```bash
-npm run start -- interactive --project-root /absolute/project --trust-workspace
+Set the provider's API key as an environment variable. Never place the key
+in CLI arguments or commit it to the repository. Then select the provider
+and a model ID supported by your account:
+
+```sh
+npm run start -- ask --provider openai --model YOUR_MODEL --message "Explain Gungnir controllers"
+npm run start -- plan --provider anthropic --model YOUR_MODEL --message "Design a Gungnir application"
+npm run start -- interactive --provider gateway --model provider/model
 ```
 
-Within the shell, use `/help`, `/mode`, `/status`, `/files`,
-`/search`, `/read`, `/cancel`, and `/exit`.
-No source edits or arbitrary subprocess execution are enabled.
+Supported environment variables: `OPENAI_API_KEY`,
+`ANTHROPIC_API_KEY`, `AI_GATEWAY_API_KEY`. There is no default model
+to avoid accidental paid requests. Optional session limits and explicit
+estimated-USD budgets are described in [Group 8 documentation](docs/group-8-models.md).
 
-## Package responsibilities
+Interactive commands: `/help`, `/mode`, `/status`, `/usage`,
+`/files`, `/search`, `/read`, `/cancel`, `/exit`.
 
-- `apps/cli`: interactive shell, mode commands, streaming and cancellation
-- `packages/contracts`: agent task/tool interfaces
-- `packages/agent-core`: validated config, workspace trust, indexed source context
-- `packages/gungnir-toolchain`: native SDK and compiler contract discovery
-- `packages/mcp-client`: official MCP v2 bridge to the separate
-  [gungnir-mcp](https://github.com/justinangeloperez327/gungnir-mcp) server
+Reading local source still requires
+`--project-root /absolute/project --trust-workspace`.
+Prompts do not automatically include source code.
 
-MCP project-context tools are still dependent on the separate server's
-Project Intelligence implementation; local CLI browsing works directly
-through the trusted Group 5 index and Group 6 adapter.
+Packages: `apps/cli`, `packages/contracts`, `packages/agent-core`,
+`packages/gungnir-toolchain`, `packages/mcp-client`, and
+`packages/model-adapters`. The existing standalone
+[gungnir-mcp](https://github.com/justinangeloperez327/gungnir-mcp)
+remains the only authoritative MCP server.
 
-See [Group 7 CLI](docs/group-7-cli.md),
-[architecture](docs/architecture.md) and [roadmap](docs/roadmap.md).
-
-CI validates Windows 2025 and Ubuntu 24.04 with Node.js 24.
-No PRs, automatic publication or deployment.
+CI runs on Windows 2025/Ubuntu 24.04 using Node 24. No PR, npm publication
+or deployment is automatically created.

@@ -1,21 +1,25 @@
 #!/usr/bin/env node
-
 import { toPublicAgentError, getFoundationStatus } from "@gungnir/agent-core";
 import { discoverToolchain } from "@gungnir/gungnir-toolchain";
 import { parseCliArguments, runAgentTerminal } from "./terminal.js";
 
 export const help = [
-  "Gungnir Agent — Group 7 interactive terminal",
+  "Gungnir Agent — Group 8 model adapters",
   "",
   "Usage:",
-  "  gungnir-agent interactive [--mode ask|plan|build] [--project-root PATH --trust-workspace]",
-  "  gungnir-agent ask|plan|build [--message TEXT] [--project-root PATH --trust-workspace]",
-  "  gungnir-agent doctor [--json]",
-  "  gungnir-agent --help | --version",
+  "  gungnir-agent interactive [--mode ask|plan|build] [MODEL] [WORKSPACE]",
+  "  gungnir-agent ask|plan|build [--message TEXT] [MODEL] [WORKSPACE]",
+  "  gungnir-agent doctor [--json] | --help | --version",
   "",
-  "Interactive commands: /help, /mode, /status, /files, /search, /read, /cancel, /exit",
-  "Ask, Plan, Build accept prompts but AI model responses are not yet implemented (Group 8).",
-  "No automatic file writes, builds, deployment or publication are enabled.",
+  "MODEL: --provider openai|anthropic|gateway --model MODEL_ID",
+  "  [--max-output-tokens N] [--session-output-tokens N] [--max-requests N]",
+  "  [--timeout-ms N] [--input-usd-per-million RATE]",
+  "  [--output-usd-per-million RATE] [--max-estimated-usd CAP]",
+  "WORKSPACE: --project-root ABSOLUTE_PATH --trust-workspace",
+  "",
+  "Keys: OPENAI_API_KEY / ANTHROPIC_API_KEY / AI_GATEWAY_API_KEY from environment.",
+  "Do not pass keys in arguments. Cost limits use user-supplied rates only.",
+  "Read-only context; no autonomous file edits, shell tools or deployments.",
 ].join("\n");
 
 async function main(args: string[]): Promise<number> {
@@ -46,17 +50,15 @@ async function main(args: string[]): Promise<number> {
     return report.state === "ready" ? 0 : 1;
   }
   if (parsed.kind === "session") {
-    try {
-      return await runAgentTerminal(parsed.options);
-    } catch (cause) {
-      const problem = toPublicAgentError(cause);
-      console.error(problem.code + ": " + problem.message);
+    try { return await runAgentTerminal(parsed.options); }
+    catch (cause) {
+      const issue = toPublicAgentError(cause);
+      console.error(issue.code + ": " + issue.message);
       return 1;
     }
   }
   return 2;
 }
-
 void main(process.argv.slice(2)).then(
   code => { process.exitCode = code; },
   () => { console.error("Unable to complete Gungnir Agent command."); process.exitCode = 1; },

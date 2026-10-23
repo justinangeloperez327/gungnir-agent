@@ -1,0 +1,21 @@
+{
+  "name": "@gungnir/model-adapters",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@gungnir/agent-core": "0.1.0",
+    "@gungnir/contracts": "0.1.0",
+    "ai": "6.0.296",
+    "@ai-sdk/openai": "3.0.128",
+    "@ai-sdk/anthropic": "3.0.118"
+  }
+}

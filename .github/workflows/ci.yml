@@ -26,6 +26,13 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      - name: Resolve new AI SDK v6 dependencies (bootstrap lock)
+        shell: bash
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            node -e 'const fs=require("fs"); const s=fs.readFileSync("package-lock.json","utf8"); console.log("LOCK_BEGIN"); for(let i=0;i<s.length;i+=1000) console.log("LOCKPART:"+JSON.stringify(s.slice(i,i+1000))); console.log("LOCK_END")'
+          fi
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
       - name: Assert Node 24

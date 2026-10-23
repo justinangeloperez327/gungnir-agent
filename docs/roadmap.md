@@ -17,7 +17,7 @@ The existing `gungnir-mcp` remains the sole official MCP server.
    browsing awaits the external `gungnir-mcp` implementation).
 7. Interactive CLI — complete: mode switching, trusted local inspection,
    streamed text events and cancellation; no model providers yet.
-8. Model adapters — AI SDK v6, provider credentials and budgets.
+8. Model adapters — complete: AI SDK v6 streaming, OpenAI/Anthropic/Gateway, environment credentials, per-session budgets. Build is text-only.
 9. Docs, examples, retrieval and source references.
 10. Task orchestration, bounded execution and session recovery.
 

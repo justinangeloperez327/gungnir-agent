@@ -25,7 +25,7 @@ export interface TextStreamBackend {
 export interface CliSessionOptions {
   readonly mode?: AgentMode;
   readonly workspace?: TrustedWorkspace;
-  /** Not installed by the CLI in Group 7. Future model adapters are Group 8. */
+  /** Optional; must be explicitly selected by the operator. */
   readonly backend?: TextStreamBackend;
 }
 
@@ -95,15 +95,16 @@ export class AgentCliSession {
           if (argument) break;
           sink({ type: "line", text: [
             "Commands: /help, /mode ask|plan|build, /status, /files [count],",
-            "/search <text>, /read <relative.gnr> [start] [count], /cancel, /exit",
-            "Normal text requires a future model adapter (Group 8).",
+            "/search <text>, /read <relative.gnr> [start] [count], /usage, /cancel, /exit",
+            "AI prompts require --provider and --model. Build produces text only.",
             "All project browsing is read-only and requires --trust-workspace.",
           ].join("\n") });
           return OK;
         case "/mode":
           if (argument === "ask" || argument === "plan" || argument === "build") {
             this.currentMode = argument;
-            sink({ type: "line", text: "Mode: " + argument + " (model not connected)" });
+            sink({ type: "line", text: "Mode: " + argument + (this.backend ?
+              " (text-only model)" : " (model not connected)") });
             return OK;
           }
           break;
@@ -112,7 +113,7 @@ export class AgentCliSession {
           sink({ type: "line", text: [
             "Mode: " + this.currentMode,
             "Workspace: " + (this.context ? "trusted (read-only)" : "not trusted"),
-            "Model backend: " + (this.backend ? "injected text stream" : "unavailable (Group 8)"),
+            "Model backend: " + (this.backend ? "injected text stream" : "unavailable (specify --provider and --model)"),
             "Last task: " + (this.last ? this.last.state : "none"),
           ].join("\n") });
           return OK;
@@ -146,6 +147,25 @@ export class AgentCliSession {
           const snippet = await this.requireContext().excerpt(parts[0], start, count);
           sink({ type: "line", text: snippet.lines.map((line, i) =>
             (snippet.startLine + i) + ": " + line).join("\n") });
+          return OK;
+        }
+        case "/usage": {
+          if (argument) break;
+          const metered = this.backend as { usage?: {
+            provider: string; model: string; requests: number;
+            inputTokens: number; outputTokens: number; estimatedCostUsd?: number;
+          } } | undefined;
+          if (!metered?.usage) {
+            sink({ type: "line", text: "No model usage recorded." });
+          } else {
+            const u = metered.usage;
+            sink({ type: "line", text:
+              "Provider: " + u.provider + " | Model: " + u.model +
+              " | Requests: " + u.requests + " | Input tokens: " + u.inputTokens +
+              " | Output tokens: " + u.outputTokens +
+              (u.estimatedCostUsd !== undefined ?
+                " | Estimated USD: " + u.estimatedCostUsd.toFixed(6) : "") });
+          }
           return OK;
         }
         case "/cancel":
@@ -182,7 +202,7 @@ export class AgentCliSession {
     if (!this.backend) {
       this.last = task.transition("failed");
       sink({ type: "error", text: this.currentMode.toUpperCase() +
-        " requires a model backend. AI providers arrive in Group 8. No code was executed or modified." });
+        " requires a model backend. Configure --provider and --model. No code was executed or modified." });
       return { continue: true, code: 3 };
     }
     const controller = new AbortController();

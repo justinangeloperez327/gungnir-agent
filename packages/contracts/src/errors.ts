@@ -16,6 +16,10 @@ export type AgentErrorCode =
   | "CONTEXT_INVALID"
   | "CONTEXT_LIMIT"
   | "CONTEXT_CANCELLED"
+  | "MODEL_CONFIG_INVALID"
+  | "MODEL_CREDENTIAL_MISSING"
+  | "MODEL_REQUEST_FAILED"
+  | "MODEL_BUDGET_EXCEEDED"
   | "INTERNAL_ERROR";
 
 export interface PublicAgentError {

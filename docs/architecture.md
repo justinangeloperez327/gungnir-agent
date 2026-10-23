@@ -1,21 +1,20 @@
-# Architecture — Groups 1–7
+# Architecture — Groups 1–8
 
 ```text
-apps/cli (mode-aware shell, operator commands, text event renderer)
-  -> packages/agent-core (tasks, trusted workspace, policy)
-  -> packages/mcp-client (read-only context adapter, outbound MCP v2)
-  -> packages/gungnir-toolchain (opt-in SDK doctor)
-
-external: justinangeloperez327/gungnir-mcp (separate stdio server)
+apps/cli (Ask/Plan/Build terminal, mode switch, cancellation)
+  -> packages/model-adapters (AI SDK v6 provider adapters; text only)
+  -> packages/agent-core (session, trusted workspace, permissions)
+  -> packages/mcp-client (outbound v2 client, opt-in only)
+  -> packages/gungnir-toolchain (doctor)
 ```
 
-Group 7 introduces an interactive UI layer, with a `TextStreamBackend`
-interface for later model providers. **No provider is installed**.
-The shell uses Group 6's `ReadOnlyContextAdapter` for project browsing,
-requiring explicit operator workspace trust. It never launches MCP
-automatically, executes compiler commands, or performs file writes.
+Group 8 uses official AI SDK v6 and matching provider packages for OpenAI,
+Anthropic and Gateway. Operators explicitly select a provider and model
+and supply keys through environment variables. CLI status/usage does not
+display secrets. No tools are registered with the model. Even Build mode
+generates plans or patches **as text** and cannot change the repository.
 
-Mode is a descriptive session setting. Any future tool execution must
-pass the independent Group 4 authorization checks, and high-risk actions
-remain blocked. Group 8 will introduce the actual model adapter,
-Group 9 retrieval controls and Group 10 durable task orchestration.
+No automatic retrieval of source text, project mutation, native compiler
+execution, external MCP actions, deployment or publication.
+Group 9 will add cited context selection and source handling.
+Group 10 will add durable bounded orchestration.

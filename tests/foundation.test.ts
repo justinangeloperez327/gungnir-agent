@@ -16,10 +16,10 @@ describe("foundation contract", () => {
   });
 });
 describe("CLI smoke tests", () => {
-  it("prints Group 7 help with explicit model limitations", () => {
+  it("prints Group 8 help with explicit model limitations", () => {
     const result = spawnSync(process.execPath, [cli, "--help"], { encoding: "utf8" });
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("Group 7 interactive");
+    expect(result.stdout).toContain("Group 8 model adapters");
     expect(result.stdout).toContain("not yet implemented");
   });
   it("prints version and contract", () => {
