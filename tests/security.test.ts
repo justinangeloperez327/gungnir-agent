@@ -33,9 +33,9 @@ describe("trusted workspace path boundaries", () => {
     await mkdir(path.join(root, "app"));
     await writeFile(path.join(root, "app", "Home.gnr"), "controller Home {}");
     const scope = await TrustedWorkspace.open(root, true);
-    expect(await scope.existingFile("app/Home.gnr")).toBe(path.join(root, "app", "Home.gnr"));
-    expect(await scope.writableFile("app/New.gnr")).toBe(path.join(root, "app", "New.gnr"));
-    expect(await scope.writableFile("app/Home.gnr")).toBe(path.join(root, "app", "Home.gnr"));
+    expect(await scope.existingFile("app/Home.gnr")).toBe(path.join(scope.root, "app", "Home.gnr"));
+    expect(await scope.writableFile("app/New.gnr")).toBe(path.join(scope.root, "app", "New.gnr"));
+    expect(await scope.writableFile("app/Home.gnr")).toBe(path.join(scope.root, "app", "Home.gnr"));
   });
   it("rejects traversal, foreign absolute paths, and sensitive workspace entries", async () => {
     const root = await temporary();
