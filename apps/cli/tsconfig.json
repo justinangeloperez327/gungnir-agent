@@ -11,6 +11,9 @@
   "references": [
     {
       "path": "../../packages/agent-core"
+    },
+    {
+      "path": "../../packages/gungnir-toolchain"
     }
   ]
 }

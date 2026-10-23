@@ -15,6 +15,7 @@
     "gungnir-agent": "./dist/index.js"
   },
   "dependencies": {
-    "@gungnir/agent-core": "0.1.0"
+    "@gungnir/agent-core": "0.1.0",
+    "@gungnir/gungnir-toolchain": "0.1.0"
   }
 }

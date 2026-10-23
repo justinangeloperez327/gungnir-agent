@@ -1,21 +1,20 @@
-# Architecture — Groups 1–2
+# Architecture — Groups 1–3
 
 ```text
 apps/cli
   -> packages/agent-core
        -> packages/contracts
        -> packages/gungnir-toolchain
+  -> packages/gungnir-toolchain (doctor)
 ```
 
-Group 2 adds shared tool/task interfaces and a minimal, synchronous agent-core foundation. CLI remains help/version only. There is no model integration, executable tool runner, file-writing implementation or MCP server.
+Group 2 provides typed configuration, DI, error handling and in-memory task states. Group 3 adds optional, read-only native Gungnir toolchain discovery with injectable probe I/O, fixed command arguments and contract parsing.
 
-## Separation of responsibilities
+- `apps/cli`: help/version and explicitly invoked `doctor`. No agent modes run.
+- `packages/gungnir-toolchain`: installed CLI/compiler discovery, SDK profile inspection, version/contract compatibility.
+- `packages/agent-core`: no process execution orchestration or runtime authorizations yet.
+- `packages/contracts`: descriptive tool capabilities and future policy interfaces.
 
-- **Contracts:** descriptive modes/capabilities and cancellable tool invocation interfaces.
-- **Agent core:** pure config validation, typed DI, sanitized errors and in-memory task lifecycle.
-- **Gungnir toolchain:** version target only. SDK discovery and compatibility negotiation are Group 3.
-- **Authorization:** not yet implemented. A `build` mode string must never authorize execution.
+A `ready` toolchain report says the installed SDK matches the documented Gungnir 1.0 contract. It does not imply any project has compiled or that arbitrary process execution is safe. The compiler and LSP remain the authority for language semantics; no duplicate Gungnir parser is planned.
 
-## Forward requirements
-
-Group 4 must enforce canonical workspace paths, symlink boundaries, explicit tool permissions, safe process arguments, timeout and cancellation. Generated code must be compiled using the native Gungnir toolchain rather than a duplicate TypeScript parser. Prompt content and tool results are untrusted and secrets must not enter public errors or logs. CI must never auto-publish or deploy.
+Security work remains in Group 4: canonical workspace/executable paths, permission enforcement, subprocess containment, timeout/cancellation and trust gates. No model output can currently initiate native commands.
