@@ -50,8 +50,13 @@ function selectedResult(
       : state === "incompatible" ? "Gungnir installation is incompatible."
       : state === "invalid" ? "Gungnir version probe failed."
       : "Gungnir installation requires additional components.",
-    source: selection.source, executable: selection.file, version, compiler,
-    compilerVersion, sdkRoot, sdkVerified, sdkProfile, contract,
+    source: selection.source, executable: selection.file,
+    ...(version !== undefined ? { version } : {}),
+    ...(compiler !== undefined ? { compiler } : {}),
+    ...(compilerVersion !== undefined ? { compilerVersion } : {}),
+    sdkRoot, sdkVerified,
+    ...(sdkProfile !== undefined ? { sdkProfile } : {}),
+    ...(contract !== undefined ? { contract } : {}),
     capabilities, diagnostics,
   };
 }
