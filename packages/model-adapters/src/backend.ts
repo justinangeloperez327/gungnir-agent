@@ -16,8 +16,8 @@ export interface ModelCall extends TextRequest {
   readonly config: ModelConfig;
 }
 export interface Usage {
-  readonly inputTokens?: number;
-  readonly outputTokens?: number;
+  readonly inputTokens?: number | undefined;
+  readonly outputTokens?: number | undefined;
 }
 export interface TextCompletion {
   readonly textStream: AsyncIterable<string>;
