@@ -104,7 +104,7 @@ export class ModelTextBackend {
     if (request.signal.aborted) {
       throw new AgentError("PROCESS_CANCELLED", "Request cancelled");
     }
-    if (request.prompt.length === 0 || request.prompt.length > 8192) {
+    if (request.prompt.length === 0 || request.prompt.length > 24000) {
       throw new AgentError("MODEL_CONFIG_INVALID", "Invalid prompt size");
     }
     const remaining = this.config.sessionOutputTokens - this.outputTokens;

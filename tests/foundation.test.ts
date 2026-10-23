@@ -16,10 +16,10 @@ describe("foundation contract", () => {
   });
 });
 describe("CLI smoke tests", () => {
-  it("prints Group 8 help with explicit model limitations", () => {
+  it("prints Group 9 help with explicit model limitations", () => {
     const result = spawnSync(process.execPath, [cli, "--help"], { encoding: "utf8" });
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("Group 8 model adapters");
+    expect(result.stdout).toContain("Group 9 knowledge retrieval");
     expect(result.stdout).toContain("--provider openai|anthropic|gateway");
   });
   it("prints version and contract", () => {

@@ -3,6 +3,7 @@ import {
   AgentError, TaskStateMachine, TrustedWorkspace, toPublicAgentError,
 } from "@gungnir/agent-core";
 import { ReadOnlyContextAdapter } from "@gungnir/mcp-client";
+import type { GungnirKnowledgeIndex, KnowledgeSource } from "@gungnir/knowledge";
 
 export type CliEvent =
   | { readonly type: "line"; readonly text: string }
@@ -27,6 +28,7 @@ export interface CliSessionOptions {
   readonly workspace?: TrustedWorkspace;
   /** Optional; must be explicitly selected by the operator. */
   readonly backend?: TextStreamBackend;
+  readonly knowledge?: GungnirKnowledgeIndex;
 }
 
 export interface LineOutcome {
@@ -56,12 +58,15 @@ export class AgentCliSession {
   private nextTask = 0;
   private readonly context: ReadOnlyContextAdapter | undefined;
   private readonly backend: TextStreamBackend | undefined;
+  private readonly knowledge: GungnirKnowledgeIndex | undefined;
+  private references: readonly KnowledgeSource[] = [];
   private currentMode: AgentMode;
 
   constructor(options: CliSessionOptions = {}) {
     this.currentMode = options.mode ?? "ask";
     this.context = options.workspace ? new ReadOnlyContextAdapter(options.workspace) : undefined;
     this.backend = options.backend;
+    this.knowledge = options.knowledge;
   }
 
   get mode(): AgentMode { return this.currentMode; }
@@ -95,7 +100,8 @@ export class AgentCliSession {
           if (argument) break;
           sink({ type: "line", text: [
             "Commands: /help, /mode ask|plan|build, /status, /files [count],",
-            "/search <text>, /read <relative.gnr> [start] [count], /usage, /cancel, /exit",
+            "/search <text>, /read <relative.gnr> [start] [count], /docs <text>,",
+            "/sources, /usage, /cancel, /exit",
             "AI prompts require --provider and --model. Build produces text only.",
             "All project browsing is read-only and requires --trust-workspace.",
           ].join("\n") });
@@ -149,6 +155,20 @@ export class AgentCliSession {
             (snippet.startLine + i) + ": " + line).join("\n") });
           return OK;
         }
+        case "/docs": {
+          if (!argument || !this.knowledge) break;
+          const found=this.knowledge.search(argument,5);
+          sink({type:"line",text:found.length ?
+            found.map(s=>"["+s.number+"] "+s.title+" — "+s.uri).join("\n") :
+            "No matching documentation found."});
+          return OK;
+        }
+        case "/sources":
+          if(argument) break;
+          sink({type:"line",text:this.references.length ?
+            this.references.map(s=>"["+s.number+"] "+s.title+" — "+s.uri).join("\n") :
+            "No sources from the last successful response."});
+          return OK;
         case "/usage": {
           if (argument) break;
           const metered = this.backend as { usage?: {
@@ -198,6 +218,7 @@ export class AgentCliSession {
       return { continue: true, code: 2 };
     }
     const task = new TaskStateMachine("cli-" + (++this.nextTask), this.currentMode);
+    this.references = [];
     this.last = task.snapshot();
     if (!this.backend) {
       this.last = task.transition("failed");
@@ -227,6 +248,11 @@ export class AgentCliSession {
       if (controller.signal.aborted) throw new AgentError("PROCESS_CANCELLED", "Request cancelled");
       if (started) sink({ type: "line", text: "" });
       this.last = task.transition("succeeded");
+      const indexed = this.backend as { sources?: readonly KnowledgeSource[] } | undefined;
+      this.references = indexed?.sources ?? [];
+      if(this.references.length) {
+        sink({type:"line",text:"Sources: " + this.references.map(s=>"["+s.number+"] "+s.uri).join("  ")});
+      }
       return OK;
     } catch (error) {
       this.last = task.transition(controller.signal.aborted ? "cancelled" : "failed");

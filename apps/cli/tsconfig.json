@@ -23,6 +23,9 @@
     },
     {
       "path": "../../packages/model-adapters"
+    },
+    {
+      "path": "../../packages/knowledge"
     }
   ]
 }

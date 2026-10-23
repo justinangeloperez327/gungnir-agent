@@ -2,6 +2,8 @@ import { createInterface } from "node:readline";
 import type { AgentMode } from "@gungnir/contracts";
 import { TrustedWorkspace } from "@gungnir/agent-core";
 import { ModelTextBackend, resolveModelConfig } from "@gungnir/model-adapters";
+import { GungnirKnowledgeIndex } from "@gungnir/knowledge";
+import { KnowledgeTextBackend } from "./knowledge-backend.js";
 import type { ModelConfigInput } from "@gungnir/model-adapters";
 import { AgentCliSession, renderCliEvent, type EventSink } from "./session.js";
 
@@ -11,6 +13,8 @@ export interface InteractiveArguments {
   readonly projectRoot?: string;
   readonly trustWorkspace: boolean;
   readonly model?: ModelConfigInput;
+  readonly docsVersion?: string;
+  readonly contextFile?: string;
 }
 export type ParsedArguments =
   | { readonly kind: "help" | "version" | "doctor"; readonly json?: boolean }
@@ -45,6 +49,8 @@ export function parseCliArguments(args: readonly string[]): ParsedArguments {
   let projectRoot: string | undefined;
   let trustWorkspace = false;
   let provider: string | undefined;
+  let docsVersion: string | undefined;
+  let contextFile: string | undefined;
   let model: string | undefined;
   const numeric: Partial<Record<NumericOption, number>> = {};
   const seen = new Set<string>();
@@ -57,6 +63,7 @@ export function parseCliArguments(args: readonly string[]): ParsedArguments {
       continue;
     }
     if (!["--mode", "--message", "--project-root", "--provider", "--model",
+      "--docs-version", "--context-file",
       ...Object.keys(MODEL_FLAGS)].includes(flag)) throw Error("Unknown CLI option");
     const value = args[++i];
     if (!value || value.startsWith("--") || value.includes("\0")) throw Error("Invalid CLI value");
@@ -70,6 +77,10 @@ export function parseCliArguments(args: readonly string[]): ParsedArguments {
       message = value;
     } else if (flag === "--project-root") {
       projectRoot = value;
+    } else if (flag === "--docs-version") {
+      docsVersion=value;
+    } else if (flag === "--context-file") {
+      contextFile=value;
     } else if (flag === "--provider") {
       provider = value;
     } else if (flag === "--model") {
@@ -85,12 +96,17 @@ export function parseCliArguments(args: readonly string[]): ParsedArguments {
   }
   if (trustWorkspace !== (projectRoot !== undefined)) throw Error("Explicit workspace trust required");
   const hasNumeric = Object.keys(numeric).length > 0;
+  if (contextFile && (!projectRoot || !trustWorkspace || !provider || !model)) {
+    throw Error("Private source context requires trusted root and an explicit model");
+  }
   if ((provider !== undefined) !== (model !== undefined) ||
       (hasNumeric && !provider)) throw Error("Both provider and model are required");
   return { kind: "session", options: {
     mode, trustWorkspace,
     ...(projectRoot ? { projectRoot } : {}),
     ...(message !== undefined ? { message } : {}),
+    ...(docsVersion ? { docsVersion } : {}),
+    ...(contextFile ? { contextFile } : {}),
     ...(provider && model ? { model: { provider, model, ...numeric } } : {}),
   } };
 }
@@ -103,9 +119,15 @@ export async function runAgentTerminal(
 ): Promise<number> {
   const workspace = args.projectRoot
     ? await TrustedWorkspace.open(args.projectRoot, args.trustWorkspace) : undefined;
-  const backend = args.model ? new ModelTextBackend(resolveModelConfig(args.model)) : undefined;
+  const knowledge = await GungnirKnowledgeIndex.load(args.docsVersion);
+  const model = args.model ? new ModelTextBackend(resolveModelConfig(args.model)) : undefined;
+  const backend = model ? new KnowledgeTextBackend(model,knowledge,{
+    ...(workspace ? { workspace } : {}),
+    ...(args.contextFile ? { projectFile:args.contextFile } : {}),
+  }) : undefined;
   const session = new AgentCliSession({
-    mode: args.mode, ...(workspace ? { workspace } : {}), ...(backend ? { backend } : {}),
+    mode: args.mode, knowledge,
+    ...(workspace ? { workspace } : {}), ...(backend ? { backend } : {}),
   });
   const sink: EventSink = event => renderCliEvent(event, output, error);
   if (args.message !== undefined) return (await session.handleLine(args.message, sink)).code;
@@ -123,7 +145,7 @@ export async function runAgentTerminal(
     else rl.close();
   };
   rl.on("SIGINT", interrupt);
-  sink({ type: "line", text: "Gungnir Agent · Group 8 " +
+  sink({ type: "line", text: "Gungnir Agent · Group 9 " +
     (backend ? "AI text streaming enabled." : "No model configured.") +
     " /help for commands." });
   prompt();

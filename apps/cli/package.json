@@ -19,6 +19,7 @@
     "@gungnir/gungnir-toolchain": "0.1.0",
     "@gungnir/mcp-client": "0.1.0",
     "@gungnir/contracts": "0.1.0",
-    "@gungnir/model-adapters": "0.1.0"
+    "@gungnir/model-adapters": "0.1.0",
+    "@gungnir/knowledge": "0.1.0"
   }
 }

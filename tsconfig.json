@@ -17,6 +17,9 @@
       "path": "./packages/model-adapters"
     },
     {
+      "path": "./packages/knowledge"
+    },
+    {
       "path": "./apps/cli"
     }
   ]

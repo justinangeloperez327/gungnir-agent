@@ -4,7 +4,7 @@ import { discoverToolchain } from "@gungnir/gungnir-toolchain";
 import { parseCliArguments, runAgentTerminal } from "./terminal.js";
 
 export const help = [
-  "Gungnir Agent — Group 8 model adapters",
+  "Gungnir Agent — Group 9 knowledge retrieval",
   "",
   "Usage:",
   "  gungnir-agent interactive [--mode ask|plan|build] [MODEL] [WORKSPACE]",
@@ -15,10 +15,12 @@ export const help = [
   "  [--max-output-tokens N] [--session-output-tokens N] [--max-requests N]",
   "  [--timeout-ms N] [--input-usd-per-million RATE]",
   "  [--output-usd-per-million RATE] [--max-estimated-usd CAP]",
+  "RETRIEVAL: [--docs-version 1.0.2] [--context-file PATH.gnr]",
   "WORKSPACE: --project-root ABSOLUTE_PATH --trust-workspace",
   "",
   "Keys: OPENAI_API_KEY / ANTHROPIC_API_KEY / AI_GATEWAY_API_KEY from environment.",
   "Do not pass keys in arguments. Cost limits use user-supplied rates only.",
+  "Pinned Gungnir docs are cited automatically. --context-file requires trusted workspace.",
   "Read-only context; no autonomous file edits, shell tools or deployments.",
 ].join("\n");
 
