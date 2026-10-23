@@ -55,7 +55,7 @@ describe("CLI streaming and cancellation boundaries", () => {
     const reply = await session.handleLine("please plan a Gungnir app", emit);
     expect(reply.code).toBe(3);
     expect(session.lastTask?.state).toBe("failed");
-    expect(events.some(e => e.type === "error" && e.text.includes("Group 8"))).toBe(true);
+    expect(events.some(e => e.type === "error" && e.text.includes("Configure --provider and --model"))).toBe(true);
     await session.handleLine("/status", emit);
     expect(events.some(e => e.type === "line" && e.text.includes("Model backend: unavailable"))).toBe(true);
   });

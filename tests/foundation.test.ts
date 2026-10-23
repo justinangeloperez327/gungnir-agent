@@ -20,7 +20,7 @@ describe("CLI smoke tests", () => {
     const result = spawnSync(process.execPath, [cli, "--help"], { encoding: "utf8" });
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("Group 8 model adapters");
-    expect(result.stdout).toContain("not yet implemented");
+    expect(result.stdout).toContain("--provider openai|anthropic|gateway");
   });
   it("prints version and contract", () => {
     const result = spawnSync(process.execPath, [cli, "--version"], { encoding: "utf8" });
