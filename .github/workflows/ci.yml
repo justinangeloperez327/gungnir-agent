@@ -1,0 +1,40 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Assert Node 24
+        run: node -e "if (process.versions.node.split('.')[0] !== '24') process.exit(1)"
+      - name: Lint
+        run: npm run lint
+      - name: Build TypeScript workspaces
+        run: npm run build
+      - name: Typecheck tests
+        run: npm run typecheck:tests
+      - name: Unit and CLI smoke tests
+        run: npm test

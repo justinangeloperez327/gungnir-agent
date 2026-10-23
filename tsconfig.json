@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/contracts"
+    },
+    {
+      "path": "./packages/gungnir-toolchain"
+    },
+    {
+      "path": "./packages/agent-core"
+    },
+    {
+      "path": "./apps/cli"
+    }
+  ]
+}
