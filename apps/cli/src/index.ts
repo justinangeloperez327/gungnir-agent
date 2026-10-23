@@ -45,13 +45,16 @@ async function main(args: string[]): Promise<number> {
     }
     return report.state === "ready" ? 0 : 1;
   }
-  try {
-    return await runAgentTerminal(parsed.options);
-  } catch (cause) {
-    const problem = toPublicAgentError(cause);
-    console.error(problem.code + ": " + problem.message);
-    return 1;
+  if (parsed.kind === "session") {
+    try {
+      return await runAgentTerminal(parsed.options);
+    } catch (cause) {
+      const problem = toPublicAgentError(cause);
+      console.error(problem.code + ": " + problem.message);
+      return 1;
+    }
   }
+  return 2;
 }
 
 void main(process.argv.slice(2)).then(

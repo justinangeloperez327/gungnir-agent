@@ -51,11 +51,11 @@ export function renderCliEvent(event: CliEvent, output: NodeJS.WritableStream, e
 }
 
 export class AgentCliSession {
-  private active?: AbortController;
+  private active: AbortController | undefined;
   private last?: TaskSnapshot;
   private nextTask = 0;
-  private readonly context?: ReadOnlyContextAdapter;
-  private readonly backend?: TextStreamBackend;
+  private readonly context: ReadOnlyContextAdapter | undefined;
+  private readonly backend: TextStreamBackend | undefined;
   private currentMode: AgentMode;
 
   constructor(options: CliSessionOptions = {}) {
