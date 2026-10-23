@@ -4,7 +4,8 @@ import {
   AgentError, createServiceToken, parseAgentConfig, ServiceContainer,
   TaskStateMachine, toPublicAgentError,
 } from "@gungnir/agent-core";
-import type { AgentConfig, ExecutionPolicy, ToolRequest, ToolResult } from "@gungnir/contracts";
+import type { AgentConfig } from "@gungnir/agent-core";
+import type { ExecutionPolicy, ToolRequest, ToolResult } from "@gungnir/contracts";
 
 const workspaceRoot = resolve("fixtures");
 
