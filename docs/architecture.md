@@ -1,30 +1,21 @@
-# Architecture — Groups 1–6
+# Architecture — Groups 1–7
 
 ```text
-apps/cli
-  -> packages/agent-core
-       -> packages/contracts
-       -> packages/gungnir-toolchain
-  -> packages/gungnir-toolchain (opt-in doctor)
+apps/cli (mode-aware shell, operator commands, text event renderer)
+  -> packages/agent-core (tasks, trusted workspace, policy)
+  -> packages/mcp-client (read-only context adapter, outbound MCP v2)
+  -> packages/gungnir-toolchain (opt-in SDK doctor)
 
-packages/mcp-client
-  -> packages/agent-core (trusted context gateway)
-  -> official @modelcontextprotocol/client v2
-       -> existing gungnir-mcp stdio server (separate repository)
+external: justinangeloperez327/gungnir-mcp (separate stdio server)
 ```
 
-Group 2: config, DI, errors and task state.
-Group 3: native Gungnir SDK detection.
-Group 4: workspace trust and restricted host-approved subprocesses.
-Group 5: read-only bounded `.gnr` indexing and context retrieval.
-Group 6: official MCP client bridge with real legacy/modern protocol tests
-against the existing gungnir-mcp server, and a local read-only context adapter.
+Group 7 introduces an interactive UI layer, with a `TextStreamBackend`
+interface for later model providers. **No provider is installed**.
+The shell uses Group 6's `ReadOnlyContextAdapter` for project browsing,
+requiring explicit operator workspace trust. It never launches MCP
+automatically, executes compiler commands, or performs file writes.
 
-**No competing MCP server is built in this repository.** The existing
-gungnir-mcp v0.4.0 exports status and toolchain-info tools only.
-Project context tools remain an external-server integration task.
-
-The CLI still supports only help/version/doctor. Ask, Plan, Build, model
-providers, MCP-triggered edits, and automatic compilation remain unavailable.
-The compiler/LSP remain authoritative; regex-indexed module hints are not
-semantically validated.
+Mode is a descriptive session setting. Any future tool execution must
+pass the independent Group 4 authorization checks, and high-risk actions
+remain blocked. Group 8 will introduce the actual model adapter,
+Group 9 retrieval controls and Group 10 durable task orchestration.

@@ -1,38 +1,49 @@
 # Gungnir Agent
 
-A Gungnir-aware coding agent foundation for the
+A Node.js 24 coding-agent foundation for the
 [Gungnir C++23 framework](https://github.com/justinangeloperez327/gungnir).
 
-> **Group 6:** Trusted `.gnr` context search and an outbound MCP v2 client
-> bridge are available. The MCP stdio server remains in the separate,
-> existing [gungnir-mcp](https://github.com/justinangeloperez327/gungnir-mcp)
-> repository. No AI calls, autonomous edits or operational Ask/Plan/Build
-> commands are enabled.
+> **Group 7:** Interactive CLI modes (Ask, Plan, Build), piped sessions,
+> streamed text rendering, cancellation and trusted read-only `.gnr`
+> browsing are implemented. **No model backend is connected yet.**
+> Text prompts return an explicit unavailable-model message until Group 8.
 
-## Requirements
-
-Node.js 24 and compatible npm. Gungnir SDK optional for package development.
+## Setup
 
 ```bash
 npm ci
 npm run check
-npm run start -- --help
+npm run start -- interactive
+npm run start -- ask
+npm run start -- plan --message "Design a Gungnir User model"
 npm run start -- doctor
 ```
 
-## Components
+To inspect an explicitly trusted Gungnir project:
 
-- `apps/cli`: help, version, opt-in SDK doctor
-- `packages/contracts`: typed task/tool interfaces
-- `packages/agent-core`: trusted workspace, policy, state and source index
-- `packages/gungnir-toolchain`: SDK/compiler detection
-- `packages/mcp-client`: official MCP v2 client for **gungnir-mcp**
-  and a local read-only project context adapter
+```bash
+npm run start -- interactive --project-root /absolute/project --trust-workspace
+```
 
-**MCP server availability:** the pinned gungnir-mcp v0.4.0 exports
-`gungnir_status` and `gungnir_toolchain_info`. Project indexing/search
-adapters exist locally here but are not yet registered as MCP server tools.
-See [Group 6 integration](docs/group-6-mcp.md).
+Within the shell, use `/help`, `/mode`, `/status`, `/files`,
+`/search`, `/read`, `/cancel`, and `/exit`.
+No source edits or arbitrary subprocess execution are enabled.
 
-CI validates Node 24, Windows/Linux, and real MCP server interoperability.
-No automatic publishing or deployment is configured.
+## Package responsibilities
+
+- `apps/cli`: interactive shell, mode commands, streaming and cancellation
+- `packages/contracts`: agent task/tool interfaces
+- `packages/agent-core`: validated config, workspace trust, indexed source context
+- `packages/gungnir-toolchain`: native SDK and compiler contract discovery
+- `packages/mcp-client`: official MCP v2 bridge to the separate
+  [gungnir-mcp](https://github.com/justinangeloperez327/gungnir-mcp) server
+
+MCP project-context tools are still dependent on the separate server's
+Project Intelligence implementation; local CLI browsing works directly
+through the trusted Group 5 index and Group 6 adapter.
+
+See [Group 7 CLI](docs/group-7-cli.md),
+[architecture](docs/architecture.md) and [roadmap](docs/roadmap.md).
+
+CI validates Windows 2025 and Ubuntu 24.04 with Node.js 24.
+No PRs, automatic publication or deployment.

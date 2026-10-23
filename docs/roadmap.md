@@ -1,42 +1,40 @@
 # Implementation roadmap — 20 groups
 
-Groups are complete only after their code and CI verification pass.
-Gungnir MCP is a **separate existing product**: project context tools should
-be registered there, not implemented as a competing stdio server here.
+Each group is complete only after implementation and CI checks.
+The existing `gungnir-mcp` remains the sole official MCP server.
 
 ## Phase I: foundation
 
-1. **Repository and CI — complete**: Node 24, npm workspaces, TS, lint, Vitest.
-2. **Core contracts — complete**: DI, typed failures and configuration.
-3. **Toolchain — complete**: SDK discovery, version/contract negotiation.
-4. **Permissions — complete**: trusted roots, host approval, restricted runner.
-5. **Context — complete**: `.gnr` indexing and read-only search.
+1. Repository and CI — complete
+2. Core contracts, DI and config — complete
+3. Native Gungnir toolchain discovery — complete
+4. Workspace trust and execution policy — complete
+5. Bounded `.gnr` project indexing — complete
 
-## Phase II: agent intelligence
+## Phase II: intelligence and interfaces
 
-6. **MCP client integration — complete (agent-side)**: official MCP v2
-   client and real-server interoperability, read-only local context adapter.
-   Exposing project context over MCP still depends on the existing
-   **gungnir-mcp Project Intelligence group**.
-7. **CLI**: interactive Ask, Plan, Build with streaming.
-8. **Models**: AI SDK v6 providers, credentials, limits.
-9. **Retrieval**: docs, examples, citations and symbol sources.
-10. **Task orchestration**: bounded planner and session lifecycle.
+6. MCP client interoperability — complete (agent-side; remote project
+   browsing awaits the external `gungnir-mcp` implementation).
+7. Interactive CLI — complete: mode switching, trusted local inspection,
+   streamed text events and cancellation; no model providers yet.
+8. Model adapters — AI SDK v6, provider credentials and budgets.
+9. Docs, examples, retrieval and source references.
+10. Task orchestration, bounded execution and session recovery.
 
 ## Phase III: native coding
 
-11. **Generators**: invoke native Gungnir project/component scaffolding.
-12. **Patches**: conflict-aware, atomic edits and rollback.
-13. **Diagnostics**: native compiler checks/IR verification and LSP.
-14. **Build/test**: native builds, targeted tests and fixtures.
-15. **Repair**: bounded compiler-guided fix loop.
+11. Native Gungnir generators.
+12. Atomic, conflict-aware patch previews and rollback.
+13. Native compiler/IR and LSP diagnostics.
+14. Native builds and targeted tests.
+15. Bounded compiler-guided repair.
 
-## Phase IV: integration and release
+## Phase IV: integration/release
 
-16. **Skills**: portable instructions and MCP configuration.
-17. **VS Code**: use existing vscode-gungnir integration and LSP.
-18. **Evaluation**: repeatable CRUD/refactor/debugging cases.
-19. **Security**: additional injection, performance and OS hardening.
-20. **Packaging**: docs, manual release and final CI.
+16. Skills and reusable agent instructions.
+17. Existing `vscode-gungnir` integration.
+18. Evaluation and reproducible regression fixtures.
+19. Security/performance/Windows/Linux hardening.
+20. Packaging, documentation and manual release.
 
-No automatic deployment or publishing.
+No automatic deployment or publication.

@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 
 const cli = resolve(process.cwd(), "apps/cli/dist/index.js");
 describe("foundation contract", () => {
-  it("does not claim that future agent modes are operational", () => {
+  it("does not falsely claim model-driven modes are available", () => {
     expect(getFoundationStatus()).toEqual({
       product: "gungnir-agent", stage: "foundation",
       languageContract: "1.0", plannedModes: ["ask", "plan", "build"],
@@ -16,31 +16,40 @@ describe("foundation contract", () => {
   });
 });
 describe("CLI smoke tests", () => {
-  it("prints Group 3 help; future modes remain unavailable", () => {
+  it("prints Group 7 help with explicit model limitations", () => {
     const result = spawnSync(process.execPath, [cli, "--help"], { encoding: "utf8" });
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain("Group 3 toolchain");
+    expect(result.stdout).toContain("Group 7 interactive");
     expect(result.stdout).toContain("not yet implemented");
   });
-  it("prints foundation version and target contract", () => {
+  it("prints version and contract", () => {
     const result = spawnSync(process.execPath, [cli, "--version"], { encoding: "utf8" });
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("0.1.0");
     expect(result.stdout).toContain("contract 1.0");
   });
-  it("rejects future modes and unsupported doctor options", () => {
-    for (const args of [["build"], ["doctor", "--unsafe"], ["ask"]]) {
+  it("rejects unsupported flags and untrusted workspace access", () => {
+    for (const args of [["doctor", "--unsafe"], ["ask", "--project-root", process.cwd()],
+      ["interactive", "--trust-workspace"], ["build", "--deploy"]]) {
       const result = spawnSync(process.execPath, [cli, ...args], { encoding: "utf8" });
       expect(result.status).toBe(2);
       expect(result.stderr).toContain("Unsupported command");
     }
   });
-  it("reports a missing installation as JSON without executing untrusted PATH entries", () => {
+  it("keeps doctor read-only and returns structured diagnostic JSON", () => {
     const result = spawnSync(process.execPath, [cli, "doctor", "--json"], {
       encoding: "utf8",
       env: { ...process.env, PATH: "", Path: "", GUNGNIR_CMAKE_PREFIX: "" },
     });
     expect(result.status).toBe(1);
     expect(JSON.parse(result.stdout)).toMatchObject({ state: "invalid" });
+  });
+  it("reports model unavailability without performing a build", () => {
+    const result = spawnSync(process.execPath, [cli, "build", "--message", "create a model"], {
+      encoding: "utf8",
+    });
+    expect(result.status).toBe(3);
+    expect(result.stderr).toContain("requires a model backend");
+    expect(result.stderr).toContain("No code was executed or modified");
   });
 });
