@@ -1,32 +1,30 @@
-# Architecture — Groups 1–5
+# Architecture — Groups 1–6
 
 ```text
 apps/cli
   -> packages/agent-core
        -> packages/contracts
        -> packages/gungnir-toolchain
-  -> packages/gungnir-toolchain (explicit doctor)
+  -> packages/gungnir-toolchain (opt-in doctor)
+
+packages/mcp-client
+  -> packages/agent-core (trusted context gateway)
+  -> official @modelcontextprotocol/client v2
+       -> existing gungnir-mcp stdio server (separate repository)
 ```
 
-- Group 2: typed configuration, DI, sanitized errors and task states.
-- Group 3: read-only SDK discovery and compiler contract detection.
-- Group 4: trusted workspace, permission engine, controlled process runner.
-- Group 5: `GungnirProjectIndex` — bounded, read-only source discovery,
-  file-category metadata, path/module hints, filename/source-line lookup.
+Group 2: config, DI, errors and task state.
+Group 3: native Gungnir SDK detection.
+Group 4: workspace trust and restricted host-approved subprocesses.
+Group 5: read-only bounded `.gnr` indexing and context retrieval.
+Group 6: official MCP client bridge with real legacy/modern protocol tests
+against the existing gungnir-mcp server, and a local read-only context adapter.
 
-The CLI still only supports help/version/doctor. Ask/Plan/Build, MCP and
-model-driven tools remain unimplemented; no model can invoke the process runner.
+**No competing MCP server is built in this repository.** The existing
+gungnir-mcp v0.4.0 exports status and toolchain-info tools only.
+Project context tools remain an external-server integration task.
 
-## Module intelligence boundary
-
-The index is a bounded navigation aid, not another Gungnir grammar parser.
-Module path and import metadata are **unverified hints**; semantically resolved
-dependencies, symbols, references and diagnostics come from the C++ compiler
-and native LSP in later groups.
-
-## Security limitations
-
-Group 4's path checks and Group 5's scan are best effort, not an OS sandbox.
-No automatic source-to-LLM forwarding is allowed; future prompt construction
-must treat indexed text as untrusted and may need secret scrubbing. No external
-downloads, application builds, auto-publishing or deployment take place.
+The CLI still supports only help/version/doctor. Ask, Plan, Build, model
+providers, MCP-triggered edits, and automatic compilation remain unavailable.
+The compiler/LSP remain authoritative; regex-indexed module hints are not
+semantically validated.

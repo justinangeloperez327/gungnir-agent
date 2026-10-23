@@ -11,6 +11,9 @@
       "path": "./packages/agent-core"
     },
     {
+      "path": "./packages/mcp-client"
+    },
+    {
       "path": "./apps/cli"
     }
   ]

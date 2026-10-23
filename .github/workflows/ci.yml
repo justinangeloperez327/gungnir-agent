@@ -32,9 +32,26 @@ jobs:
         run: node -e "if (process.versions.node.split('.')[0] !== '24') process.exit(1)"
       - name: Lint
         run: npm run lint
-      - name: Build TypeScript workspaces
+      - name: Build workspaces
         run: npm run build
       - name: Typecheck tests
         run: npm run typecheck:tests
       - name: Unit and CLI smoke tests
         run: npm test
+      - name: Checkout existing gungnir-mcp (pinned)
+        uses: actions/checkout@v7
+        with:
+          repository: justinangeloperez327/gungnir-mcp
+          ref: 0ebdf784ab08ff97baffe9965d7de9c7e0a93674
+          path: integration/gungnir-mcp
+          persist-credentials: false
+      - name: Install pinned MCP server dependencies
+        working-directory: integration/gungnir-mcp
+        run: npm ci --no-audit --no-fund
+      - name: Build pinned MCP server
+        working-directory: integration/gungnir-mcp
+        run: npm run build
+      - name: Validate real MCP stdio interoperability
+        env:
+          GUNGNIR_MCP_SERVER_ENTRY: integration/gungnir-mcp/dist/index.js
+        run: npm test -- tests/mcp-client.integration.test.ts
