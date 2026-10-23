@@ -51,9 +51,9 @@ describe("model streaming and bounded budgets (no paid network calls)", () => {
       return {textStream:(async function*(){yield "ok";})(),
         totalUsage:Promise.resolve({inputTokens:1,outputTokens:1}),finishReason:Promise.resolve("stop")};
     });
-    for await (const _chunk of backend.streamText({mode:"plan",prompt:"a",signal})) { /* consume */ }
+    for await (const chunk of backend.streamText({mode:"plan",prompt:"a",signal})) { void chunk; }
     await expect(async () => {
-      for await (const _chunk of backend.streamText({mode:"plan",prompt:"b",signal})) { /* consume */ }
+      for await (const chunk of backend.streamText({mode:"plan",prompt:"b",signal})) { void chunk; }
     }).rejects.toMatchObject({code:"MODEL_BUDGET_EXCEEDED"});
     expect(count).toBe(1);
   });
@@ -62,14 +62,14 @@ describe("model streaming and bounded budgets (no paid network calls)", () => {
       inputPerMillionUsd:100,outputPerMillionUsd:100,maxEstimatedCostUsd:0.001,
     }),() => {throw Error("Should not run");});
     await expect(async () => {
-      for await (const _chunk of backend.streamText({mode:"ask",prompt:"test",signal})) { /* consume */ }
+      for await (const chunk of backend.streamText({mode:"ask",prompt:"test",signal})) { void chunk; }
     }).rejects.toMatchObject({code:"MODEL_BUDGET_EXCEEDED"});
     expect(backend.usage.requests).toBe(0);
   });
   it("sanitizes provider failures rather than echoing credentials", async () => {
     const backend = new ModelTextBackend(config(), () => {throw Error("test-key");});
     await expect(async () => {
-      for await (const _chunk of backend.streamText({mode:"ask",prompt:"test",signal})) { /* consume */ }
+      for await (const chunk of backend.streamText({mode:"ask",prompt:"test",signal})) { void chunk; }
     }).rejects.toMatchObject({code:"MODEL_REQUEST_FAILED",message:"Model generation failed"});
   });
   it("propagates cancellation without invoking the model", async () => {
@@ -77,7 +77,7 @@ describe("model streaming and bounded budgets (no paid network calls)", () => {
     controller.abort();
     const backend = new ModelTextBackend(config(),() => {throw Error("must not call");});
     await expect(async () => {
-      for await (const _chunk of backend.streamText({mode:"ask",prompt:"test",signal:controller.signal})) { /* consume */ }
+      for await (const chunk of backend.streamText({mode:"ask",prompt:"test",signal:controller.signal})) { void chunk; }
     }).rejects.toMatchObject({code:"PROCESS_CANCELLED"});
   });
 });
