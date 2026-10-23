@@ -65,14 +65,14 @@ function invokeLive(call: ModelCall): TextCompletion {
     onError: () => { streamingError = true; },
   });
   return {
-    async *textStream(): AsyncGenerator<string> {
+    textStream: (async function*(): AsyncGenerator<string> {
       for await (const chunk of result.textStream) yield chunk;
       if (streamingError || await result.finishReason === "error") {
         throw new AgentError("MODEL_REQUEST_FAILED", "Model generation failed");
       }
-    },
-    totalUsage: result.totalUsage,
-    finishReason: result.finishReason,
+    })(),
+    totalUsage: Promise.resolve(result.totalUsage),
+    finishReason: Promise.resolve(result.finishReason),
   };
 }
 function countTokens(value: number | undefined, fallback: number): number {

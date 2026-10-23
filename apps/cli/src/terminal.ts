@@ -16,7 +16,8 @@ export type ParsedArguments =
   | { readonly kind: "help" | "version" | "doctor"; readonly json?: boolean }
   | { readonly kind: "session"; readonly options: InteractiveArguments };
 
-const MODEL_FLAGS: Readonly<Record<string, keyof ModelConfigInput>> = {
+type NumericOption = Exclude<keyof ModelConfigInput, "provider" | "model">;
+const MODEL_FLAGS: Readonly<Record<string, NumericOption>> = {
   "--max-output-tokens": "maxOutputTokens",
   "--session-output-tokens": "sessionOutputTokens",
   "--max-requests": "maxRequests",
@@ -45,7 +46,7 @@ export function parseCliArguments(args: readonly string[]): ParsedArguments {
   let trustWorkspace = false;
   let provider: string | undefined;
   let model: string | undefined;
-  const numeric: Partial<Record<keyof ModelConfigInput, number>> = {};
+  const numeric: Partial<Record<NumericOption, number>> = {};
   const seen = new Set<string>();
   for (let i = 1; i < args.length; i++) {
     const flag = args[i]!;
