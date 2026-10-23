@@ -17,3 +17,9 @@ export type AgentErrorCode =
   | "CONTEXT_LIMIT"
   | "CONTEXT_CANCELLED"
   | "INTERNAL_ERROR";
+
+export interface PublicAgentError {
+  readonly code: AgentErrorCode;
+  readonly message: string;
+  readonly retryable: boolean;
+}
